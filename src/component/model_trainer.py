@@ -13,6 +13,7 @@ from src.constant import *
 from src.exception import VisibilityException
 from src.logger import logging
 from src.utils.main_utils import MainUtils
+from src.cloud_storage.aws_syncer import S3Sync
 
 from dataclasses import dataclass
 
@@ -155,6 +156,9 @@ class ModelTrainer:
             os.makedirs(os.path.dirname(self.model_trainer_config.trained_model_path),exist_ok=True)
 
             self.utils.save_object(file_path = self.model_trainer_config.trained_model_path,obj = custom_model)
+
+            self.s3_sync.sync_folder_to_S3(folder = os.path.dirname(self.model_trainer_config.trained_model_path),
+                                           aws_bucket_name = AWS_S3_BUCKET_NAME)
 
             return best_models_score
         
