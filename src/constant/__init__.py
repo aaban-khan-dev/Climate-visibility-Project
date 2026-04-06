@@ -3,7 +3,8 @@ import os
 
 
 AWS_S3_BUCKET_NAME = "climate-visibility.123"
-MONGO_DATABASE_NAME = "visibility"
+MONGO_DATABASE_NAME = "Visibility"
+MONGO_COLLECTION_NAME = "data"
 
 TARGET_COLUMN = "VISIBILITY"
 CLUSTER_LABEL_COLUMN = "Cluster"

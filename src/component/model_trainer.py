@@ -19,7 +19,7 @@ from dataclasses import dataclass
 
 @dataclass
 
-class ModeTrainerConfig:
+class ModelTrainerConfig:
     model_trainer_dir:str = os.path.join(artifact_folder,"model_trainer")
     trained_model_path = os.path.join(model_trainer_dir,"trained_model","model.pkl")
     expected_accuracy = 0.6
@@ -39,7 +39,7 @@ class VisibilityModel:
             logging.info("Using the trained model to get predictions")
             transformed_features = self.preprocessing_object.transform(X)
             logging.info("used the trained model to get predictions")
-            return self.trained_model_object.predict(transformed_features)
+            return self.trainer_model_object.predict(transformed_features)
         except Exception as e:
             raise VisibilityException(e,sys)
         
@@ -53,13 +53,13 @@ class VisibilityModel:
 class ModelTrainer:
 
     def __init__(self):
-        self.model_trainer_config = ModeTrainerConfig()
+        self.model_trainer_config = ModelTrainerConfig()
         self.utils = MainUtils()
+        self.s3_sync = S3Sync()
 
     
-    def evaluate_models(self,X,y,models):
+    def evaluate_models(self,X_train,y_train,X_test,y_test,models):
         try:
-            X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=42)
             model_report = {}
 
             for i in range(len(list(models))):
@@ -70,6 +70,8 @@ class ModelTrainer:
                 train_model_score = r2_score(y_train,y_train_pred)
                 test_model_score = r2_score(y_test,y_test_pred)
                 model_report[list(models.keys())[i]] = test_model_score
+            
+            return model_report
 
         except Exception as e:
             raise VisibilityException(e,sys)
@@ -126,7 +128,7 @@ class ModelTrainer:
 
             logging.info("Extracting model config file path")
 
-            model_report:dict = self.evaluate_models(X_train,y_train,model = models)
+            model_report:dict = self.evaluate_models(X_train,y_train,X_test,y_test,models = models)
             best_model_score = max(sorted(model_report.values()))
 
             best_model_name = list(model_report.keys())[list(model_report.values()).index(best_model_score)]
@@ -157,14 +159,13 @@ class ModelTrainer:
 
             self.utils.save_object(file_path = self.model_trainer_config.trained_model_path,obj = custom_model)
 
-            self.s3_sync.sync_folder_to_S3(folder = os.path.dirname(self.model_trainer_config.trained_model_path),
+            try:
+                self.s3_sync.sync_folder_to_S3(folder = os.path.dirname(self.model_trainer_config.trained_model_path),
                                            aws_bucket_name = AWS_S3_BUCKET_NAME)
+            except Exception as e:
+                logging.info(f"Failed to sync model artifacts to S3 bucket: {AWS_S3_BUCKET_NAME}. Error: {e}")
 
             return best_models_score
         
         except Exception as e:
             raise VisibilityException(e,sys)
-        
-
-
-            

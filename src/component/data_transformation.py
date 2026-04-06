@@ -53,6 +53,8 @@ class DataTransformation:
 
         try:
             raw_files = os.listdir(valid_data_dir)
+            if not raw_files:
+                raise VisibilityException(f"No files found in the directory: {valid_data_dir}",sys)
             csv_data = []
             for filename in raw_files:
                 data = pd.read_csv(os.path.join(valid_data_dir,filename))
@@ -80,7 +82,7 @@ class DataTransformation:
             X = dataframe.drop(columns = [TARGET_COLUMN],axis=1)
             Y = dataframe[TARGET_COLUMN]
 
-            X_train,X_test,y_train,y_test = train_test_split(X,Y,test_size = 0.2)
+            X_train,X_test,y_train,y_test = train_test_split(X,Y,test_size = 0.2,random_state = 42)
 
             preprocessor = StandardScaler()
             X_train_scaled = preprocessor.fit_transform(X_train)

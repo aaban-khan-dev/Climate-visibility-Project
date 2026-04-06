@@ -28,7 +28,7 @@ model_selection:
             - 100
             - 1000
 
-      Random Forest Regression:
+      Random Forest Regressor:
         search_param_grid:
           n_estimators:
            - 50 

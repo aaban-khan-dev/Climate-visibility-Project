@@ -33,7 +33,7 @@ class TrainingPipeline:
         
     def start_data_transformation(self,validation_data_dir):
         try:
-            data_transformation = DataTransformation(validation_data_dir = validation_data_dir)
+            data_transformation = DataTransformation(valid_data_dir = validation_data_dir)
             train_arr,test_arr,preprocessor_path = data_transformation.initiate_data_transformation()
             return train_arr,test_arr,preprocessor_path        
         except Exception as e:
@@ -56,7 +56,8 @@ class TrainingPipeline:
             train_arr,test_arr,preprocessor_path = self.start_data_transformation(validation_data_dir)
             r2_squared = self.start_model_trainer(train_arr,test_arr,preprocessor_path)
 
-            print("training completed: training model score: ",r2_squared)
+            print("training completed: training model score: {r2_squared}")
+            
             logging.info("training completed: training model score: ",r2_squared)
 
         except Exception as e:
