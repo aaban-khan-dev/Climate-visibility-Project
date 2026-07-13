@@ -34,17 +34,35 @@ This helps improve **decision-making in safety-critical environments**.
 
 ---
 
-## 🏗️ Project Architecture
-The system follows a modular pipeline:
+```mermaid
+flowchart LR
 
-1. Data Ingestion (MongoDB / external sources)  
-2. Data Validation  
-3. Data Transformation  
-4. Model Training  
-5. Model Evaluation  
-6. Model Pushing to AWS S3  
-7. Prediction Pipeline  
-8. API Deployment (FastAPI)  
+A[Playwright Scraper] --> B[(MongoDB Atlas)]
+
+subgraph Training Pipeline
+C[Data Ingestion]
+D[Data Validation]
+E[Data Transformation]
+F[Model Trainer]
+G[RentEstimator]
+end
+
+B --> C
+C --> D
+D --> E
+E --> F
+F --> G
+
+G --> H[(AWS S3)]
+
+subgraph Serving
+I[Prediction Pipeline]
+J[Flask UI<br/>SHAP<br/>What-if Analysis]
+end
+
+H --> I
+I --> J
+```
 
 ---
 
