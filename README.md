@@ -34,35 +34,41 @@ This helps improve **decision-making in safety-critical environments**.
 
 ---
 
-```mermaid
-flowchart LR
+flowchart TB
 
-A[Playwright Scraper] --> B[(MongoDB Atlas)]
+A[Playwright Scraper]
+B[(MongoDB Atlas)]
 
 subgraph Training Pipeline
+direction LR
 C[Data Ingestion]
 D[Data Validation]
 E[Data Transformation]
+end
+
+subgraph Model Training
+direction LR
 F[Model Trainer]
 G[RentEstimator]
 end
 
+H[(AWS S3)]
+
+subgraph Serving
+direction LR
+I[Prediction Pipeline]
+J["Flask UI<br/>Prediction<br/>SHAP<br/>What-if"]
+end
+
+A --> B
 B --> C
 C --> D
 D --> E
 E --> F
 F --> G
-
-G --> H[(AWS S3)]
-
-subgraph Serving
-I[Prediction Pipeline]
-J[Flask UI<br/>SHAP<br/>What-if Analysis]
-end
-
+G --> H
 H --> I
 I --> J
-```
 
 ---
 
